@@ -1,0 +1,126 @@
+package dev.cartspeed;
+
+import com.destroystokyo.paper.event.entity.EntityAddToWorldEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.FeatureFlag;
+import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Minecart;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Gives every minecart the configured top speed and empty-cart slowdown as it enters a world (spawned, placed,
+ * dispensed or loaded with its chunk), and runs the lava cauldron breaker.
+ */
+public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabExecutor {
+
+    private Settings settings;
+    private BukkitTask cauldronTimer;
+
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
+        PluginCommand command = Objects.requireNonNull(getCommand("cartspeed"), "cartspeed is missing from plugin.yml");
+        command.setExecutor(this);
+        command.setTabCompleter(this);
+        getServer().getPluginManager().registerEvents(this, this);
+        reload();
+    }
+
+    @Override
+    public void onDisable() {
+        if (cauldronTimer != null) {
+            cauldronTimer.cancel();
+        }
+    }
+
+    /** Re-reads config.yml, applies it to every loaded minecart and restarts the cauldron breaker. */
+    private int reload() {
+        reloadConfig();
+        settings = Settings.from(getConfig(), getLogger());
+
+        int carts = 0;
+        for (World world : getServer().getWorlds()) {
+            for (Minecart cart : world.getEntitiesByClass(Minecart.class)) {
+                apply(cart);
+                carts++;
+            }
+        }
+
+        if (cauldronTimer != null) {
+            cauldronTimer.cancel();
+            cauldronTimer = null;
+        }
+        if (settings.lavaCauldronBreaksCarts()) {
+            cauldronTimer = getServer().getScheduler().runTaskTimer(this, new CauldronBreaker(), 1L, 1L);
+        }
+
+        getLogger().info(describe() + " Applied to " + carts + " loaded minecart(s).");
+        warnIfOldPhysics();
+        return carts;
+    }
+
+    @EventHandler
+    public void onEntityAdd(EntityAddToWorldEvent event) {
+        if (event.getEntity() instanceof Minecart cart) {
+            apply(cart);
+        }
+    }
+
+    private void apply(Minecart cart) {
+        cart.setMaxSpeed(settings.cartSpeedPerTick());
+        cart.setSlowWhenEmpty(settings.slowEmptyCarts());
+    }
+
+    private String describe() {
+        return "Cart speed " + Settings.trim(settings.cartSpeed()) + " blocks/s, empty carts "
+                + (settings.slowEmptyCarts() ? "slow down faster (vanilla)" : "coast like full ones")
+                + ", lava cauldron breaker " + (settings.lavaCauldronBreaksCarts() ? "on" : "off") + ".";
+    }
+
+    /** Above 8 blocks/s the old minecart physics can throw carts off the track at corners. */
+    private void warnIfOldPhysics() {
+        if (settings.cartSpeed() <= Settings.VANILLA_SPEED) {
+            return;
+        }
+        for (World world : getServer().getWorlds()) {
+            if (!world.getFeatureFlags().contains(FeatureFlag.MINECART_IMPROVEMENTS)) {
+                getLogger().warning("The experimental minecart physics (minecart_improvements) is off in " + world.getName()
+                        + ". cart-speed above " + Settings.trim(Settings.VANILLA_SPEED)
+                        + " is meant for it; with the old physics carts can come off the track at corners.");
+                return;
+            }
+        }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 0) {
+            sender.sendMessage(Component.text("CartSpeed: " + describe(), NamedTextColor.GREEN));
+            return true;
+        }
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            int carts = reload();
+            sender.sendMessage(Component.text("CartSpeed reloaded. " + describe() + " Applied to " + carts
+                    + " loaded minecart(s).", NamedTextColor.GREEN));
+            return true;
+        }
+        sender.sendMessage(Component.text("Usage: /" + label + " [reload]", NamedTextColor.RED));
+        return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        return args.length == 1 && "reload".startsWith(args[0].toLowerCase()) ? List.of("reload") : List.of();
+    }
+}
