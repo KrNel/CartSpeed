@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 (2026-11-19)
+
+- No changes from 1.1.0. Released under a new version number so it could be uploaded to CurseForge as the main
+  file.
+
 ## 1.1.0 (2026-11-19)
 
 ### Changed

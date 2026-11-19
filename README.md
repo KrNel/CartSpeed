@@ -46,7 +46,7 @@ carts keep the spacing the dispenser gives them and never meet.
 
 ## Installation
 
-1. Put `CartSpeed-1.1.0.jar` in your server's `plugins/` folder.
+1. Put `CartSpeed-1.1.1.jar` in your server's `plugins/` folder.
 2. Restart the server.
 3. Edit `plugins/CartSpeed/config.yml`, then run `/cartspeed reload`.
 
@@ -147,7 +147,7 @@ Needs JDK 25 or newer and Maven:
 mvn package
 ```
 
-The jar is written to `target/CartSpeed-1.1.0.jar`.
+The jar is written to `target/CartSpeed-1.1.1.jar`.
 
 ## License
 
