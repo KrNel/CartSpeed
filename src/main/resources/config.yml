@@ -1,12 +1,16 @@
 # CartSpeed settings. Run /cartspeed reload after editing.
 
-# Top speed of every minecart, in blocks per second. 8 is vanilla. The fastest is 1000, the most the experimental
-# minecart physics allows (the limit of the max_minecart_speed game rule, which this replaces for minecarts).
+# CartSpeed only changes plain minecarts, the kind mobs and players ride. Chest, hopper, furnace, TNT, spawner and
+# command block minecarts are left alone and keep vanilla behaviour, so item collectors and other machines aren't
+# affected.
+
+# Top speed of plain minecarts, in blocks per second. 8 is vanilla. The fastest is 1000, the most the experimental
+# minecart physics allows (the limit of the max_minecart_speed game rule, which this replaces for plain minecarts).
 # Carts only get up to this speed where powered rails keep pushing them, and a powered rail adds about 1.2 on top
 # for the moment the cart is on it. Carts in water go half as fast.
 cart-speed: 8
 
-# Whether empty minecarts lose speed faster than carts with something riding them, as in vanilla (true).
+# Whether empty plain minecarts lose speed faster than ones with something riding them, as in vanilla (true).
 # false lets empty carts coast like full ones, so a line of empty and mob-carrying carts all keep the same speed
 # and the spacing between them, instead of full carts catching up with empty ones and jamming.
 slow-empty-carts: false

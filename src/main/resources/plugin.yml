@@ -2,7 +2,7 @@ name: CartSpeed
 version: '${project.version}'
 main: dev.cartspeed.CartSpeedPlugin
 api-version: '26.1'
-description: Sets how fast minecarts can go, lets empty carts coast like full ones, and makes lava cauldrons break carts again.
+description: Sets how fast plain minecarts can go, lets empty ones coast like full ones, and makes lava cauldrons break them again.
 
 commands:
   cartspeed:

@@ -1,17 +1,20 @@
 # CartSpeed
 
 A Paper plugin for minecart mob farms, such as wither skeleton (WiSke) train farms, on Minecraft 26.3 with the
-experimental minecart physics. It sets how fast minecarts can go, lets empty carts coast like full ones so
-lines of carts don't jam, and makes lava cauldrons break minecarts again.
+experimental minecart physics. It sets how fast plain minecarts can go, lets empty ones coast like full ones so
+lines of carts don't jam, and makes lava cauldrons break them again.
 
 ## Features
 
-- **Cart speed:** set every minecart's top speed, from 1 to 1000 blocks/s. 8 is vanilla, and 1000 is the most
-  the experimental physics allows.
+- **Cart speed:** set the top speed of plain minecarts, from 1 to 1000 blocks/s. 8 is vanilla, and 1000 is the
+  most the experimental physics allows.
 - **No extra slowdown for empty carts:** empty minecarts coast like ones carrying a mob, so carts keep their
   spacing instead of catching up with each other and colliding.
 - **Lava cauldron breaker:** a minecart that runs into a lava cauldron at the end of its track breaks, and the
   minecart drops straight down for a hopper to collect.
+- **Other minecarts left alone:** only plain minecarts, the kind mobs and players ride, are changed. Chest,
+  hopper, furnace, TNT, spawner and command block minecarts keep vanilla behaviour, so item collectors and other
+  minecart machines work as before.
 
 ## Requirements
 
@@ -43,13 +46,22 @@ carts keep the spacing the dispenser gives them and never meet.
 
 ## Installation
 
-1. Put `CartSpeed-1.0.0.jar` in your server's `plugins/` folder.
+1. Put `CartSpeed-1.1.0.jar` in your server's `plugins/` folder.
 2. Restart the server.
 3. Edit `plugins/CartSpeed/config.yml`, then run `/cartspeed reload`.
 
 `cart-speed` starts at 8, the vanilla limit, so raise it for faster carts.
 
-Don't run CartSpeed alongside another plugin that changes minecart speeds or breaks minecarts at lava
+CartSpeed is built to work alongside plugins that only speed up carts with a player in them, such as
+[Fast Player Minecarts](https://modrinth.com/plugin/lynx-minecarts):
+
+- **While a player rides:** that plugin sets the cart's speed.
+- **When the player or mob gets out:** CartSpeed puts the cart back to `cart-speed`.
+- **Mob farms:** Fast Player Minecarts resets a cart to its `defaultSpeed` whenever anything gets out, including
+  a mob thrown off by an activator rail. CartSpeed undoes that, so farm carts keep their speed after the drop-off.
+  You can leave its `defaultSpeed` at 8, the speed it slows player carts to at corners.
+
+Don't run CartSpeed alongside a plugin that sets the speed of every minecart or breaks minecarts at lava
 cauldrons. They would fight over the same carts.
 
 ## Configuration
@@ -58,7 +70,7 @@ cauldrons. They would fight over the same carts.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `cart-speed` | `8` | Top speed of every minecart in blocks/s, from 1 to 1000. 8 is vanilla. |
+| `cart-speed` | `8` | Top speed of plain minecarts in blocks/s, from 1 to 1000. 8 is vanilla. |
 | `slow-empty-carts` | `false` | `true` is vanilla: empty carts lose speed faster than carts with something riding them. |
 | `lava-cauldron-breaks-carts` | `true` | Break minecarts that run into a lava cauldron, dropping the minecart straight down. |
 
@@ -67,15 +79,19 @@ cauldrons. They would fight over the same carts.
 | Command | What it does |
 | --- | --- |
 | `/cartspeed` | Shows the current settings. |
-| `/cartspeed reload` | Re-reads `config.yml` and applies it to every loaded minecart. |
+| `/cartspeed reload` | Re-reads `config.yml` and applies it to every loaded plain minecart. |
 
 Both need `cartspeed.admin`, which operators have by default.
 
 ## How it works
 
-- Each minecart gets the speed limit and the empty-cart setting as it enters a world: when it's placed,
-  dispensed, spawned or loaded with its chunk. `/cartspeed reload` applies them to every loaded minecart.
-  This covers every kind of minecart in every world, and replaces the `max_minecart_speed` game rule for them.
+- Each plain minecart gets the speed limit and the empty-cart setting as it enters a world: when it's placed,
+  dispensed, spawned or loaded with its chunk. `/cartspeed reload` applies them to every loaded plain minecart.
+  This covers every world, and replaces the `max_minecart_speed` game rule for plain minecarts. Other kinds of
+  minecart still follow the game rule and slow down when empty, as in vanilla.
+- When a mob or player gets out of a plain minecart, including a mob thrown off by an activator rail, CartSpeed
+  applies its settings to the cart again. It does this after other plugins have reacted, so a plugin that resets
+  the cart's speed at that moment doesn't leave it slowed down.
 - `cart-speed` is a limit, not a set speed. Carts only reach it where powered rails keep pushing them, and a
   powered rail adds about 1.2 blocks/s on top while a cart is on it, so 8 allows up to 9.2. Carts in water
   are limited to half.
@@ -131,7 +147,7 @@ Needs JDK 25 or newer and Maven:
 mvn package
 ```
 
-The jar is written to `target/CartSpeed-1.0.0.jar`.
+The jar is written to `target/CartSpeed-1.1.0.jar`.
 
 ## License
 
