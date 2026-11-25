@@ -2,7 +2,7 @@
 
 A Paper plugin for minecart mob farms, such as wither skeleton (WiSke) train farms, on Minecraft 26.3 with the
 experimental minecart physics. It sets how fast plain minecarts can go, lets empty ones coast like full ones so
-lines of carts don't jam, and makes lava cauldrons break them again.
+lines of carts don't jam, and makes lava cauldrons break minecarts again.
 
 ## Features
 
@@ -10,11 +10,11 @@ lines of carts don't jam, and makes lava cauldrons break them again.
   most the experimental physics allows.
 - **No extra slowdown for empty carts:** empty minecarts coast like ones carrying a mob, so carts keep their
   spacing instead of catching up with each other and colliding.
-- **Lava cauldron breaker:** a minecart that runs into a lava cauldron at the end of its track breaks, and the
-  minecart drops straight down for a hopper to collect.
-- **Other minecarts left alone:** only plain minecarts, the kind mobs and players ride, are changed. Chest,
-  hopper, furnace, TNT, spawner and command block minecarts keep vanilla behaviour, so item collectors and other
-  minecart machines work as before.
+- **Lava cauldron breaker:** a minecart of any kind that runs into a lava cauldron at the end of its track
+  breaks, as lava breaks minecarts in vanilla. The minecart drops straight down for a hopper to collect.
+- **Other minecarts keep their vanilla speed:** only plain minecarts, the kind mobs and players ride, get
+  CartSpeed's speed and empty-cart settings. Chest, hopper, furnace, TNT, spawner and command block minecarts
+  keep vanilla speeds, so item collectors and other minecart machines aren't sped up.
 
 ## Requirements
 
@@ -46,7 +46,7 @@ carts keep the spacing the dispenser gives them and never meet.
 
 ## Installation
 
-1. Put `CartSpeed-1.1.1.jar` in your server's `plugins/` folder.
+1. Put `CartSpeed-1.2.0.jar` in your server's `plugins/` folder.
 2. Restart the server.
 3. Edit `plugins/CartSpeed/config.yml`, then run `/cartspeed reload`.
 
@@ -72,7 +72,7 @@ cauldrons. They would fight over the same carts.
 | --- | --- | --- |
 | `cart-speed` | `8` | Top speed of plain minecarts in blocks/s, from 1 to 1000. 8 is vanilla. |
 | `slow-empty-carts` | `false` | `true` is vanilla: empty carts lose speed faster than carts with something riding them. |
-| `lava-cauldron-breaks-carts` | `true` | Break minecarts that run into a lava cauldron, dropping the minecart straight down. |
+| `lava-cauldron-breaks-carts` | `true` | Break minecarts of every kind that run into a lava cauldron, dropping the minecart straight down. |
 
 ## Commands and permissions
 
@@ -96,12 +96,16 @@ Both need `cartspeed.admin`, which operators have by default.
   powered rail adds about 1.2 blocks/s on top while a cart is on it, so 8 allows up to 9.2. Carts in water
   are limited to half.
 - With the experimental physics, a minecart stops against a lava cauldron's wall and never touches the lava,
-  so the usual lava cauldron cart breakers stopped working. Every tick, CartSpeed breaks any plain minecart
-  (not a chest, hopper, furnace or TNT minecart) pressed against a lava cauldron just past the end of its
-  rail:
-  - The minecart item drops straight down with no random throw, so a hopper under the last rail catches it.
-  - The item keeps the cart's custom name.
+  so the usual lava cauldron cart breakers stopped working. Every tick, CartSpeed breaks any minecart pressed
+  against a lava cauldron just past the end of its rail, the way lava breaks each kind in vanilla:
+  - Plain, chest, hopper and furnace minecarts drop as themselves. Spawner and command block minecarts drop a
+    plain minecart, as in vanilla.
+  - Chest and hopper minecarts also drop everything inside them.
+  - TNT minecarts are lit instead and explode a moment later, as lava does to them in vanilla.
+  - Everything drops straight down with no random throw, so a hopper under the last rail catches it.
+  - The minecart item keeps the cart's custom name.
   - A cart carrying a player is broken too, as lava used to do.
+  - The `entity_drops` and `tnt_explodes` game rules work as in vanilla.
   - The break fires a `VehicleDestroyEvent`, so protection plugins can cancel it.
 
 ## Tips for fast farms
@@ -147,7 +151,7 @@ Needs JDK 25 or newer and Maven:
 mvn package
 ```
 
-The jar is written to `target/CartSpeed-1.1.1.jar`.
+The jar is written to `target/CartSpeed-1.2.0.jar`.
 
 ## License
 

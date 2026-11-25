@@ -1,8 +1,7 @@
 # CartSpeed settings. Run /cartspeed reload after editing.
 
-# CartSpeed only changes plain minecarts, the kind mobs and players ride. Chest, hopper, furnace, TNT, spawner and
-# command block minecarts are left alone and keep vanilla behaviour, so item collectors and other machines aren't
-# affected.
+# The speed settings only change plain minecarts, the kind mobs and players ride. Chest, hopper, furnace, TNT,
+# spawner and command block minecarts keep vanilla speeds, so item collectors and other machines aren't sped up.
 
 # Top speed of plain minecarts, in blocks per second. 8 is vanilla. The fastest is 1000, the most the experimental
 # minecart physics allows (the limit of the max_minecart_speed game rule, which this replaces for plain minecarts).
@@ -15,7 +14,8 @@ cart-speed: 8
 # and the spacing between them, instead of full carts catching up with empty ones and jamming.
 slow-empty-carts: false
 
-# Break carts that run into a lava cauldron at the end of their track, like lava did before the experimental
-# minecart physics (which stops carts against the cauldron's wall, out of the lava). The minecart drops straight
-# down so a hopper under the last rail collects it.
+# Break minecarts of every kind that run into a lava cauldron at the end of their track, like lava did before the
+# experimental minecart physics (which stops carts against the cauldron's wall, out of the lava). Chest and hopper
+# minecarts drop their contents too, and TNT minecarts explode, as in vanilla. Everything drops straight down so a
+# hopper under the last rail collects it.
 lava-cauldron-breaks-carts: true

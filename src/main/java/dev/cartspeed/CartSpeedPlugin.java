@@ -22,10 +22,10 @@ import java.util.Objects;
 
 /**
  * Gives every plain minecart (the kind mobs and players ride) the configured top speed and empty-cart slowdown as it
- * enters a world (spawned, placed, dispensed or loaded with its chunk) and again whenever a passenger gets out, and
- * runs the lava cauldron breaker. Chest,
- * hopper, furnace, TNT, spawner and command block minecarts are left alone, so item collectors and other machines
- * keep their vanilla speeds.
+ * enters a world (spawned, placed, dispensed or loaded with its chunk) and again whenever a passenger gets out. Chest,
+ * hopper, furnace, TNT, spawner and command block minecarts keep their vanilla speeds, so item collectors and other
+ * machines aren't sped up. Also runs the lava cauldron breaker, which breaks every kind of minecart, as lava does in
+ * vanilla.
  */
 public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabExecutor {
 

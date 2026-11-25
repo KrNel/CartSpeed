@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.2.0 (2026-11-25)
+
+### Changed
+
+- The lava cauldron breaker now breaks every kind of minecart, as lava does in vanilla, not only plain minecarts:
+  - Chest, hopper and furnace minecarts drop as themselves. Spawner and command block minecarts drop a plain
+    minecart, as in vanilla.
+  - Chest and hopper minecarts also drop everything inside them, straight down like the minecart.
+  - TNT minecarts are lit and explode, as lava does to them in vanilla.
+- The breaker follows the `entity_drops` game rule: with it off, broken carts drop nothing, as in vanilla.
+
+The speed settings still only change plain minecarts.
+
+### Upgrading
+
+- A chest, hopper or other minecart whose track ends at a lava cauldron will now be broken there, as it would be
+  in vanilla without the experimental physics. Move any such track away from the cauldron if it should keep
+  running, or set `lava-cauldron-breaks-carts: false`.
+
 ## 1.1.1 (2026-11-19)
 
 - No changes from 1.1.0. Released under a new version number so it could be uploaded to CurseForge as the main
