@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.0 (2026-11-25)
+
+### Added
+
+- `reattach-falling-carts` (on by default): a minecart that goes off a ledge is pulled onto a rail up to 2 blocks
+  below it, as the old minecart physics did. The experimental physics only catches a cart within about 1 block of a
+  rail, so carts fly further before landing, and further the faster they go. This applies to every kind of
+  minecart, and carries the cart's speed and riders with it. A cart isn't moved if another minecart is already in
+  the way, so jams don't push carts off the track.
+
+### Upgrading
+
+- Your existing `config.yml` won't have the new setting, and it's on unless you add
+  `reattach-falling-carts: false`. Builds made for the experimental physics that rely on carts flying off a ledge
+  over rails within 2 blocks below will now see those carts caught instead.
+
 ## 1.2.0 (2026-11-25)
 
 ### Changed

@@ -19,3 +19,8 @@ slow-empty-carts: false
 # minecarts drop their contents too, and TNT minecarts explode, as in vanilla. Everything drops straight down so a
 # hopper under the last rail collects it.
 lava-cauldron-breaks-carts: true
+
+# Pull falling minecarts onto a rail up to 2 blocks below them, as the old minecart physics did (true). The
+# experimental physics only catches a cart within about 1 block of a rail, so a cart that goes off a ledge flies in
+# an arc and lands further along, the faster it goes. Applies to every kind of minecart.
+reattach-falling-carts: true

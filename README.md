@@ -2,7 +2,8 @@
 
 A Paper plugin for minecart mob farms, such as wither skeleton (WiSke) train farms, on Minecraft 26.3 with the
 experimental minecart physics. It sets how fast plain minecarts can go, lets empty ones coast like full ones so
-lines of carts don't jam, and makes lava cauldrons break minecarts again.
+lines of carts don't jam, makes lava cauldrons break minecarts again, and catches falling carts on rails below them
+as the old physics did.
 
 ## Features
 
@@ -12,6 +13,8 @@ lines of carts don't jam, and makes lava cauldrons break minecarts again.
   spacing instead of catching up with each other and colliding.
 - **Lava cauldron breaker:** a minecart of any kind that runs into a lava cauldron at the end of its track
   breaks, as lava breaks minecarts in vanilla. The minecart drops straight down for a hopper to collect.
+- **Falling carts reattach to rails:** a minecart that goes off a ledge is pulled onto a rail up to 2 blocks below
+  it, as the old physics did, instead of flying further before it lands.
 - **Other minecarts keep their vanilla speed:** only plain minecarts, the kind mobs and players ride, get
   CartSpeed's speed and empty-cart settings. Chest, hopper, furnace, TNT, spawner and command block minecarts
   keep vanilla speeds, so item collectors and other minecart machines aren't sped up.
@@ -46,7 +49,7 @@ carts keep the spacing the dispenser gives them and never meet.
 
 ## Installation
 
-1. Put `CartSpeed-1.2.0.jar` in your server's `plugins/` folder.
+1. Put `CartSpeed-1.3.0.jar` in your server's `plugins/` folder.
 2. Restart the server.
 3. Edit `plugins/CartSpeed/config.yml`, then run `/cartspeed reload`.
 
@@ -73,6 +76,7 @@ cauldrons. They would fight over the same carts.
 | `cart-speed` | `8` | Top speed of plain minecarts in blocks/s, from 1 to 1000. 8 is vanilla. |
 | `slow-empty-carts` | `false` | `true` is vanilla: empty carts lose speed faster than carts with something riding them. |
 | `lava-cauldron-breaks-carts` | `true` | Break minecarts of every kind that run into a lava cauldron, dropping the minecart straight down. |
+| `reattach-falling-carts` | `true` | Pull falling minecarts of every kind onto a rail up to 2 blocks below them, as the old physics did. `false` leaves them to the experimental physics. |
 
 ## Commands and permissions
 
@@ -107,6 +111,16 @@ Both need `cartspeed.admin`, which operators have by default.
   - A cart carrying a player is broken too, as lava used to do.
   - The `entity_drops` and `tnt_explodes` game rules work as in vanilla.
   - The break fires a `VehicleDestroyEvent`, so protection plugins can cancel it.
+- The old physics looked for a rail in a cart's own block and the block below it, so a cart that went off a ledge
+  was caught by a rail up to 2 blocks lower almost at once. The experimental physics only catches a cart within
+  about 1 block of a rail, so a cart falls in an arc and lands further along the faster it goes. In testing, a
+  cart at 30 blocks/s going off a 2-block ledge landed 11 blocks out; with `reattach-falling-carts` it landed 5.5
+  blocks out. Every tick, CartSpeed moves each falling cart that the old physics would have caught down onto the
+  rail, keeping its speed and riders:
+  - It only acts in worlds with the experimental physics, and only on carts the experimental physics wouldn't
+    catch itself.
+  - A cart isn't moved if another minecart is already where it would go. In a jam carts get pushed up on top of
+    each other, and moving one down into another shoves carts off the track.
 
 ## Tips for fast farms
 
@@ -151,7 +165,7 @@ Needs JDK 25 or newer and Maven:
 mvn package
 ```
 
-The jar is written to `target/CartSpeed-1.2.0.jar`.
+The jar is written to `target/CartSpeed-1.3.0.jar`.
 
 ## License
 

@@ -25,12 +25,13 @@ import java.util.Objects;
  * enters a world (spawned, placed, dispensed or loaded with its chunk) and again whenever a passenger gets out. Chest,
  * hopper, furnace, TNT, spawner and command block minecarts keep their vanilla speeds, so item collectors and other
  * machines aren't sped up. Also runs the lava cauldron breaker, which breaks every kind of minecart, as lava does in
- * vanilla.
+ * vanilla, and the rail catcher, which pulls falling minecarts onto rails below them as the old physics did.
  */
 public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabExecutor {
 
     private Settings settings;
     private BukkitTask cauldronTimer;
+    private BukkitTask railTimer;
 
     @Override
     public void onEnable() {
@@ -44,12 +45,21 @@ public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabEx
 
     @Override
     public void onDisable() {
+        stopTimers();
+    }
+
+    private void stopTimers() {
         if (cauldronTimer != null) {
             cauldronTimer.cancel();
+            cauldronTimer = null;
+        }
+        if (railTimer != null) {
+            railTimer.cancel();
+            railTimer = null;
         }
     }
 
-    /** Re-reads config.yml, applies it to every loaded plain minecart and restarts the cauldron breaker. */
+    /** Re-reads config.yml, applies it to every loaded plain minecart and restarts the cauldron breaker and rail catcher. */
     private int reload() {
         reloadConfig();
         settings = Settings.from(getConfig(), getLogger());
@@ -62,12 +72,12 @@ public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabEx
             }
         }
 
-        if (cauldronTimer != null) {
-            cauldronTimer.cancel();
-            cauldronTimer = null;
-        }
+        stopTimers();
         if (settings.lavaCauldronBreaksCarts()) {
             cauldronTimer = getServer().getScheduler().runTaskTimer(this, new CauldronBreaker(), 1L, 1L);
+        }
+        if (settings.reattachFallingCarts()) {
+            railTimer = getServer().getScheduler().runTaskTimer(this, new RailCatcher(), 1L, 1L);
         }
 
         getLogger().info(describe() + " Applied to " + carts + " loaded plain minecart(s).");
@@ -102,7 +112,9 @@ public final class CartSpeedPlugin extends JavaPlugin implements Listener, TabEx
     private String describe() {
         return "Cart speed " + Settings.trim(settings.cartSpeed()) + " blocks/s, empty carts "
                 + (settings.slowEmptyCarts() ? "slow down faster (vanilla)" : "coast like full ones")
-                + ", lava cauldron breaker " + (settings.lavaCauldronBreaksCarts() ? "on" : "off") + ".";
+                + ", lava cauldron breaker " + (settings.lavaCauldronBreaksCarts() ? "on" : "off")
+                + ", falling carts " + (settings.reattachFallingCarts() ? "reattach to rails up to 2 blocks below"
+                : "follow the experimental physics") + ".";
     }
 
     /** Above 8 blocks/s the old minecart physics can throw carts off the track at corners. */

@@ -7,7 +7,8 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 /** What config.yml says. Speeds are in blocks per second. */
-record Settings(double cartSpeed, boolean slowEmptyCarts, boolean lavaCauldronBreaksCarts) {
+record Settings(double cartSpeed, boolean slowEmptyCarts, boolean lavaCauldronBreaksCarts,
+               boolean reattachFallingCarts) {
 
     static final double VANILLA_SPEED = 8.0;
     /** The slowest and fastest the max_minecart_speed game rule allows; the fastest is the experimental physics' limit. */
@@ -17,7 +18,7 @@ record Settings(double cartSpeed, boolean slowEmptyCarts, boolean lavaCauldronBr
 
     static Settings from(FileConfiguration config, Logger logger) {
         return new Settings(cartSpeed(config, logger), config.getBoolean("slow-empty-carts", false),
-                config.getBoolean("lava-cauldron-breaks-carts", true));
+                config.getBoolean("lava-cauldron-breaks-carts", true), config.getBoolean("reattach-falling-carts", true));
     }
 
     private static double cartSpeed(FileConfiguration config, Logger logger) {
